@@ -5,7 +5,7 @@ import { geminiConfig } from './config';
 
 // 配置全局 fetch
 const originalFetch = globalThis.fetch;
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   globalThis.fetch = fetchWithProxy;
 }
 
