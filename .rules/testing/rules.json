@@ -1,0 +1,44 @@
+{
+  "general": {
+    "framework": "Jest",
+    "coverage": {
+      "statements": 80,
+      "branches": 80,
+      "functions": 80,
+      "lines": 80
+    }
+  },
+  "unitTests": {
+    "location": "tests/unit",
+    "naming": "*.test.ts",
+    "structure": {
+      "describe": "描述测试套件",
+      "it": "描述具体测试用例",
+      "expect": "断言测试结果"
+    }
+  },
+  "integrationTests": {
+    "location": "tests/integration",
+    "naming": "*.integration.test.ts",
+    "focus": [
+      "API接口集成",
+      "数据流程",
+      "组件交互"
+    ]
+  },
+  "e2eTests": {
+    "location": "tests/e2e",
+    "framework": "Cypress",
+    "naming": "*.cy.ts",
+    "scenarios": [
+      "用户流程测试",
+      "关键功能测试",
+      "性能测试"
+    ]
+  },
+  "mocking": {
+    "api": "MSW (Mock Service Worker)",
+    "data": "工厂模式生成测试数据",
+    "time": "使用Jest的timer mocks"
+  }
+} 

@@ -1,0 +1,41 @@
+{
+  "typescript": {
+    "strict": true,
+    "indent": 2,
+    "quotes": "single",
+    "semicolons": true,
+    "maxLineLength": 100,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "arrowParens": "avoid"
+  },
+  "react": {
+    "componentStyle": "functional",
+    "propsInterface": true,
+    "stateManagement": {
+      "primary": "hooks",
+      "global": "zustand"
+    },
+    "componentStructure": [
+      "imports",
+      "types",
+      "component",
+      "styles",
+      "exports"
+    ]
+  },
+  "css": {
+    "methodology": "BEM",
+    "preprocessor": "tailwind",
+    "modules": true
+  },
+  "naming": {
+    "components": "PascalCase",
+    "hooks": "useHookName",
+    "utils": "camelCase",
+    "constants": "UPPER_SNAKE_CASE",
+    "types": "PascalCase",
+    "interfaces": "IPascalCase",
+    "enums": "EPascalCase"
+  }
+} 

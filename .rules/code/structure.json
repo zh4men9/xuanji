@@ -1,0 +1,63 @@
+{
+  "directories": {
+    "src": {
+      "description": "主要源代码目录",
+      "structure": {
+        "app": {
+          "description": "Next.js应用主目录",
+          "contents": ["layout.tsx", "page.tsx", "loading.tsx", "error.tsx"]
+        },
+        "components": {
+          "description": "React组件目录",
+          "subdirectories": {
+            "common": "通用UI组件",
+            "features": "业务功能组件",
+            "layouts": "布局组件",
+            "divination": "算命相关组件"
+          }
+        },
+        "lib": {
+          "description": "工具函数和服务",
+          "files": {
+            "gemini.ts": "Gemini API客户端",
+            "divination.ts": "算命核心逻辑",
+            "utils.ts": "通用工具函数",
+            "constants.ts": "常量定义"
+          }
+        },
+        "types": {
+          "description": "TypeScript类型定义",
+          "files": {
+            "divination.types.ts": "算命相关类型",
+            "api.types.ts": "API相关类型",
+            "common.types.ts": "通用类型"
+          }
+        },
+        "styles": {
+          "description": "样式文件",
+          "files": {
+            "globals.css": "全局样式",
+            "themes.css": "主题相关样式",
+            "*.module.css": "组件样式模块"
+          }
+        }
+      }
+    },
+    "tests": {
+      "description": "测试文件目录",
+      "structure": {
+        "unit": "单元测试",
+        "integration": "集成测试",
+        "e2e": "端到端测试"
+      }
+    },
+    "docs": {
+      "description": "文档目录",
+      "files": {
+        "api.md": "API文档",
+        "components.md": "组件文档",
+        "deployment.md": "部署文档"
+      }
+    }
+  }
+} 

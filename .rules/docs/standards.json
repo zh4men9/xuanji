@@ -1,0 +1,55 @@
+{
+  "components": {
+    "required": [
+      "组件描述",
+      "Props接口定义",
+      "使用示例",
+      "注意事项"
+    ],
+    "format": "TSDoc",
+    "example": {
+      "code": true,
+      "preview": true,
+      "props": true
+    }
+  },
+  "api": {
+    "required": [
+      "接口描述",
+      "请求参数",
+      "响应格式",
+      "错误码",
+      "调用示例"
+    ],
+    "format": "OpenAPI/Swagger",
+    "versioning": true
+  },
+  "codeComments": {
+    "when": [
+      "复杂业务逻辑",
+      "算法实现",
+      "特殊处理"
+    ],
+    "format": {
+      "singleLine": "// 简短说明",
+      "multiLine": "/** 详细说明 */"
+    }
+  },
+  "readme": {
+    "sections": [
+      "项目简介",
+      "技术栈",
+      "开发环境",
+      "安装部署",
+      "使用说明",
+      "贡献指南"
+    ]
+  },
+  "changelog": {
+    "format": "Keep a Changelog",
+    "versions": {
+      "unreleased": "开发中的变更",
+      "released": "已发布的版本"
+    }
+  }
+} 
