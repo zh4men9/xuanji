@@ -62,5 +62,3 @@ env/
 venv/
 .env/
 .venv/
-
-test_gemini.py

@@ -4,8 +4,8 @@
       "description": "主要源代码目录",
       "structure": {
         "app": {
-          "description": "Next.js应用主目录",
-          "contents": ["layout.tsx", "page.tsx", "loading.tsx", "error.tsx"]
+          "description": "Next.js 应用路由目录（已弃用，仅保留旧代码）",
+          "contents": []
         },
         "components": {
           "description": "React组件目录",
@@ -58,6 +58,23 @@
         "components.md": "组件文档",
         "deployment.md": "部署文档"
       }
+    },
+    "app": {
+      "description": "Next.js 14+ 应用路由主目录",
+      "contents": [
+        "layout.tsx", 
+        "page.tsx",
+        "loading.tsx",
+        "error.tsx",
+        "template.tsx",
+        "not-found.tsx"
+      ],
+      "subdirectories": [
+        "(root)", 
+        "api", 
+        "dashboard",
+        "divination"
+      ]
     }
   }
 } 

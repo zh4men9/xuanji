@@ -1,202 +1,110 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { IGeminiConfig, IDivinationRequest, IDivinationResponse } from '../types/divination.types';
-import { fetchWithProxy } from './proxy';
-import { geminiConfig } from './config';
+import { MODEL_MAPPING } from '@/constants/models';
 
-// 配置全局 fetch
-const originalFetch = globalThis.fetch;
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  globalThis.fetch = fetchWithProxy;
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
 }
 
-// 重试装饰器
-function retry<T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3,
-  backoffFactor: number = 1.5,
-  initialWait: number = 3000
-): Promise<T> {
-  return new Promise((resolve, reject) => {
-    let attempts = 0;
-    let waitTime = initialWait;
-
-    const attempt = async () => {
-      try {
-        const result = await fn();
-        resolve(result);
-      } catch (error) {
-        attempts++;
-        console.error(`第 ${attempts} 次调用失败:`, error);
-
-        if (attempts >= maxRetries) {
-          reject(error);
-          return;
-        }
-
-        console.log(`等待 ${waitTime / 1000} 秒后重试...`);
-        setTimeout(attempt, waitTime);
-        waitTime *= backoffFactor;
-      }
-    };
-
-    attempt();
-  });
+interface ChatCompletionParams {
+  apiKey: string;
+  messages: ChatMessage[];
+  model?: string;
+  temperature?: number;
 }
 
-export class GeminiClient {
-  private client: GoogleGenerativeAI;
-  private chat: any;
-  private history: Array<{ role: string; parts: Array<{ text: string }> }>;
+// 可重试的HTTP状态码
+const RETRYABLE_STATUS_CODES = new Set([429, 500, 502, 503, 504]);
 
-  constructor(config: IGeminiConfig) {
-    this.client = new GoogleGenerativeAI(config.apiKey);
-    this.history = [];
-    
-    // 初始化聊天
-    const model = this.client.getGenerativeModel({ 
-      model: config.model,
-      generationConfig: {
-        temperature: config.temperature,
-        maxOutputTokens: config.maxOutputTokens,
-        topK: config.topK,
-        topP: config.topP,
-      }
-    });
+export async function chatCompletion({
+  apiKey,
+  messages,
+  model = 'gpt-4-turbo-preview',
+  temperature = 0.7
+}: ChatCompletionParams) {
+  // 参数校验
+  if (!apiKey?.trim()) throw new Error('API密钥不能为空');
+  if (!Array.isArray(messages)) throw new Error('messages必须是数组');
 
-    this.chat = model.startChat({
-      generationConfig: {
-        temperature: config.temperature,
-        maxOutputTokens: config.maxOutputTokens,
-        topK: config.topK,
-        topP: config.topP,
+  const targetModel = model;
+  
+  try {
+    // 使用代理服务器
+    const response = await fetch('https://vercel-gemini.zh4men9.top/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
       },
-      history: this.history,
+      body: JSON.stringify({
+        model: targetModel,
+        messages: messages,
+        temperature: Math.min(Math.max(temperature, 0), 2)
+      }),
+      // 添加超时设置
+      signal: AbortSignal.timeout(15000) // 15秒超时
     });
-  }
 
-  /**
-   * 生成算命回答
-   * @param request 算命请求
-   * @returns 算命响应
-   */
-  async generateDivination(request: IDivinationRequest): Promise<IDivinationResponse> {
-    return retry(async () => {
-      try {
-        // 构建提示词
-        const prompt = this.buildPrompt(request);
-
-        // 添加用户消息到历史记录
-        this.history.push({
-          role: 'user',
-          parts: [{ text: prompt }]
-        });
-
-        // 发送消息并获取回答
-        const result = await this.chat.sendMessage(prompt);
-        const response = result.response;
-        const text = response.text();
-
-        // 添加模型回答到历史记录
-        this.history.push({
-          role: 'model',
-          parts: [{ text }]
-        });
-
-        // 解析回答
-        return this.parseResponse(text);
-      } catch (error: any) {
-        console.error('Gemini API调用失败:', error);
-        
-        // 如果是模型不可用错误，给出更具体的提示
-        if (error.message?.includes('Model not found') || error.message?.includes('not supported')) {
-          throw new Error('当前模型暂时不可用，请检查模型名称或尝试使用 gemini-pro 模型');
-        }
-        
-        throw new Error('算命服务暂时不可用，请稍后再试');
+    if (!response.ok) {
+      // 处理可重试错误
+      if (RETRYABLE_STATUS_CODES.has(response.status)) {
+        throw new Error(`[Retryable] ${response.status} ${response.statusText}`);
       }
-    });
-  }
 
-  /**
-   * 清除对话历史
-   */
-  clearHistory() {
-    this.history = [];
-    // 重新初始化聊天
-    const model = this.client.getGenerativeModel({ 
-      model: geminiConfig.model,
-      generationConfig: {
-        temperature: geminiConfig.temperature,
-        maxOutputTokens: geminiConfig.maxOutputTokens,
-        topK: geminiConfig.topK,
-        topP: geminiConfig.topP,
-      }
-    });
+      const error = await response.json();
+      throw new Error(error.error?.message || '请求失败');
+    }
 
-    this.chat = model.startChat({
-      generationConfig: {
-        temperature: geminiConfig.temperature,
-        maxOutputTokens: geminiConfig.maxOutputTokens,
-        topK: geminiConfig.topK,
-        topP: geminiConfig.topP,
-      },
-      history: this.history,
-    });
-  }
-
-  /**
-   * 构建提示词
-   * @param request 算命请求
-   * @returns 提示词
-   */
-  private buildPrompt(request: IDivinationRequest): string {
-    const { question, birthDateTime, name, gender } = request;
+    const data = await response.json();
     
-    let prompt = `作为一个专业的算命大师，请根据以下信息进行分析和预测：\n\n`;
-    prompt += `问题：${question}\n`;
+    // 解析响应
+    const answer = data.choices?.[0]?.message?.content || '';
     
-    if (birthDateTime) {
-      prompt += `出生日期时间：${birthDateTime}\n`;
-    }
-    if (name) {
-      prompt += `姓名：${name}\n`;
-    }
-    if (gender) {
-      prompt += `性别：${gender}\n`;
-    }
-
-    prompt += `\n请提供以下格式的回答：
-1. 详细的分析和预测
-2. 各方面运势评分（0-100）：总体运势、感情运势、事业运势、财运、健康运势
-3. 具体的建议（3-5条）
-
-请用中文回答，语气要温和专业，回答要有逻辑性和说服力。`;
-
-    return prompt;
-  }
-
-  /**
-   * 解析API响应
-   * @param text API响应文本
-   * @returns 格式化的算命响应
-   */
-  private parseResponse(text: string): IDivinationResponse {
-    // 简单的示例解析逻辑，实际项目中需要更复杂的解析
-    const lines = text.split('\n');
-    const answer = lines[0];
-    const advice = lines.filter(line => line.startsWith('- ')).map(line => line.slice(2));
+    // 提取运势分数和建议
+    const scores = extractFortuneScores(answer);
+    const advice = extractAdvice(answer);
 
     return {
       answer,
-      fortune: {
-        overall: Math.floor(Math.random() * 100),
-        love: Math.floor(Math.random() * 100),
-        career: Math.floor(Math.random() * 100),
-        wealth: Math.floor(Math.random() * 100),
-        health: Math.floor(Math.random() * 100),
-      },
-      advice: advice.length > 0 ? advice : ['保持乐观积极的心态', '注意作息规律', '多关注身边的机会'],
+      fortune: scores,
+      advice,
       timestamp: new Date().toISOString(),
     };
+  } catch (error: any) {
+    console.error('Gemini API Error:', error);
+    
+    // 如果是超时错误，提供更友好的错误信息
+    if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+      throw new Error('请求超时，请稍后重试');
+    }
+    
+    throw new Error(error.message || '调用 AI 服务失败');
   }
+}
+
+// 辅助函数：从文本中提取运势分数
+function extractFortuneScores(text: string) {
+  const defaultScore = 70;
+  return {
+    overall: extractScore(text, '总体运势') || defaultScore,
+    love: extractScore(text, '感情运势') || defaultScore,
+    career: extractScore(text, '事业运势') || defaultScore,
+    wealth: extractScore(text, '财运') || defaultScore,
+    health: extractScore(text, '健康运势') || defaultScore,
+  };
+}
+
+function extractScore(text: string, type: string): number {
+  const regex = new RegExp(`${type}[：:](\\s*)(\\d+)`, 'i');
+  const match = text.match(regex);
+  return match ? parseInt(match[2]) : 0;
+}
+
+function extractAdvice(text: string): string[] {
+  const adviceSection = text.split(/建议[：:]/i)[1];
+  if (!adviceSection) return ['暂无具体建议'];
+  
+  return adviceSection
+    .split(/[。\n]/)
+    .map(advice => advice.trim())
+    .filter(advice => advice.length > 0);
 }

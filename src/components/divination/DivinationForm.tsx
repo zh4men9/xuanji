@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import {
   Box,
@@ -11,16 +13,12 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useDivinationStore } from '@/lib/divination';
-import { EDivinationType, IDivinationRequest } from '@/types/divination.types';
+import type { IDivinationRequest } from '@/types/divination.types';
 
-/**
- * 算命表单组件
- */
 export const DivinationForm = () => {
   const toast = useToast();
-  const { startDivination, isLoading } = useDivinationStore();
+  const { generateDivination, isLoading } = useDivinationStore();
 
-  // 表单状态
   const [formData, setFormData] = useState<IDivinationRequest>({
     question: '',
     birthDateTime: '',
@@ -28,10 +26,13 @@ export const DivinationForm = () => {
     gender: undefined,
   });
 
-  // 算命类型
-  const [type, setType] = useState<EDivinationType>(EDivinationType.GENERAL);
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-  // 处理表单提交
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -46,7 +47,7 @@ export const DivinationForm = () => {
     }
 
     try {
-      await startDivination(formData, type);
+      await generateDivination(formData);
     } catch (error) {
       toast({
         title: '算命失败',
@@ -58,25 +59,17 @@ export const DivinationForm = () => {
     }
   };
 
-  // 处理输入变化
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   return (
     <Box as="form" onSubmit={handleSubmit} width="100%" maxW="600px" mx="auto">
-      <VStack spacing={4}>
+      <VStack spacing={6}>
         <FormControl isRequired>
-          <FormLabel>您想问什么？</FormLabel>
+          <FormLabel>您的问题</FormLabel>
           <Textarea
             name="question"
             value={formData.question}
             onChange={handleChange}
-            placeholder="例如：我最近的事业运势如何？"
-            minH="100px"
+            placeholder="请输入您想问的问题..."
+            minH="120px"
           />
         </FormControl>
 
@@ -114,20 +107,6 @@ export const DivinationForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl>
-          <FormLabel>算命类型</FormLabel>
-          <Select
-            value={type}
-            onChange={(e) => setType(e.target.value as EDivinationType)}
-          >
-            <option value={EDivinationType.GENERAL}>综合运势</option>
-            <option value={EDivinationType.LOVE}>感情运势</option>
-            <option value={EDivinationType.CAREER}>事业运势</option>
-            <option value={EDivinationType.WEALTH}>财运</option>
-            <option value={EDivinationType.HEALTH}>健康运势</option>
-          </Select>
-        </FormControl>
-
         <Button
           type="submit"
           colorScheme="red"
@@ -140,4 +119,4 @@ export const DivinationForm = () => {
       </VStack>
     </Box>
   );
-}; 
+};

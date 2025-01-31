@@ -1,167 +1,65 @@
 'use client';
 
-import {
-  Box,
-  VStack,
-  Text,
-  Progress,
-  Heading,
-  List,
-  ListItem,
-  ListIcon,
-  Button,
-  HStack,
-  Textarea,
-  useToast,
-} from '@chakra-ui/react';
-import { CheckCircleIcon } from '@chakra-ui/icons';
+import { Box, VStack, Heading, Text } from '@chakra-ui/react';
 import { useDivinationStore } from '@/lib/divination';
-import { formatFortuneScore, getFortuneColor } from '@/lib/divination';
-import { EDivinationType } from '@/types/divination.types';
-import { useState } from 'react';
+import { Button } from '@chakra-ui/react';
 
 export const DivinationResult = () => {
-  const { currentResponse, clearCurrentResult, history, startDivination, isLoading } = useDivinationStore();
-  const [followUpQuestion, setFollowUpQuestion] = useState('');
-  const toast = useToast();
+  const { currentResponse, clearResult } = useDivinationStore();
 
   if (!currentResponse) {
-    return null;
+    return <Text>No divination result to display.</Text>;
   }
 
-  const { answer, fortune, advice } = currentResponse;
-
-  const handleFollowUp = async () => {
-    if (!followUpQuestion.trim()) {
-      toast({
-        title: '请输入您的问题',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    try {
-      await startDivination({ question: followUpQuestion }, EDivinationType.GENERAL);
-      setFollowUpQuestion('');
-    } catch (error) {
-      toast({
-        title: '提问失败',
-        description: error instanceof Error ? error.message : '请稍后重试',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
+  const { fortune, advice, answer, timestamp } = currentResponse;
 
   return (
-    <VStack spacing={6} align="stretch" width="100%" maxW="800px" mx="auto">
-      {/* 对话历史 */}
-      <Box>
-        <Heading as="h3" size="md" mb={4}>
-          对话历史
-        </Heading>
-        <VStack spacing={4} align="stretch">
-          {history.map((item, index) => (
-            <Box 
-              key={item.id} 
-              p={4} 
-              borderWidth="1px" 
-              borderRadius="lg" 
-              bg={index === 0 ? 'white' : 'gray.50'}
-            >
-              <Text fontWeight="bold" mb={2}>
-                问：{item.request.question}
-              </Text>
-              <Text whiteSpace="pre-wrap">
-                答：{item.response.answer}
-              </Text>
-              {index === 0 && (
-                <>
-                  <Box mt={4}>
-                    <Heading as="h4" size="sm" mb={3}>
-                      运势分析
-                    </Heading>
-                    <VStack spacing={3} align="stretch">
-                      <Box>
-                        <Text mb={1}>总体运势 ({item.response.fortune.overall}分)</Text>
-                        <Progress value={item.response.fortune.overall} colorScheme={getFortuneColor(item.response.fortune.overall)} />
-                      </Box>
-                      <Box>
-                        <Text mb={1}>感情运势 ({item.response.fortune.love}分)</Text>
-                        <Progress value={item.response.fortune.love} colorScheme={getFortuneColor(item.response.fortune.love)} />
-                      </Box>
-                      <Box>
-                        <Text mb={1}>事业运势 ({item.response.fortune.career}分)</Text>
-                        <Progress value={item.response.fortune.career} colorScheme={getFortuneColor(item.response.fortune.career)} />
-                      </Box>
-                      <Box>
-                        <Text mb={1}>财运 ({item.response.fortune.wealth}分)</Text>
-                        <Progress value={item.response.fortune.wealth} colorScheme={getFortuneColor(item.response.fortune.wealth)} />
-                      </Box>
-                      <Box>
-                        <Text mb={1}>健康运势 ({item.response.fortune.health}分)</Text>
-                        <Progress value={item.response.fortune.health} colorScheme={getFortuneColor(item.response.fortune.health)} />
-                      </Box>
-                    </VStack>
-                  </Box>
+    <Box padding={4} borderWidth="1px" borderRadius="md">
+      <VStack spacing={4} align="stretch">
+        <Box textAlign="center">
+          <Heading as="h2" size="lg">
+            算命结果
+          </Heading>
+          <Text fontSize="sm" color="gray.500">
+            {timestamp && new Date(timestamp).toLocaleString()}
+          </Text>
+        </Box>
 
-                  <Box mt={4}>
-                    <Heading as="h4" size="sm" mb={3}>
-                      大师建议
-                    </Heading>
-                    <List spacing={2}>
-                      {item.response.advice.map((adviceItem, i) => (
-                        <ListItem key={i} display="flex" alignItems="center">
-                          <ListIcon as={CheckCircleIcon} color="green.500" />
-                          <Text>{adviceItem}</Text>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Box>
-                </>
-              )}
-            </Box>
-          ))}
-        </VStack>
-      </Box>
+        <Box>
+          <Heading as="h3" size="md" mb={2}>
+            运势分析
+          </Heading>
+          <Text>总体运势: {fortune?.overall}</Text>
+          <Text>感情运势: {fortune?.love}</Text>
+          <Text>事业运势: {fortune?.career}</Text>
+          <Text>财运: {fortune?.wealth}</Text>
+          <Text>健康运势: {fortune?.health}</Text>
+        </Box>
 
-      {/* 继续提问 */}
-      <Box borderWidth="1px" borderRadius="lg" p={4} bg="white">
-        <Heading as="h3" size="md" mb={4}>
-          继续提问
-        </Heading>
-        <VStack spacing={4}>
-          <Textarea
-            value={followUpQuestion}
-            onChange={(e) => setFollowUpQuestion(e.target.value)}
-            placeholder="请输入您的后续问题..."
-            minH="100px"
-          />
-          <HStack width="100%" spacing={4}>
-            <Button
-              onClick={handleFollowUp}
-              colorScheme="red"
-              size="lg"
-              flex={1}
-              isLoading={isLoading}
-            >
-              继续提问
-            </Button>
-            <Button
-              onClick={clearCurrentResult}
-              colorScheme="gray"
-              variant="outline"
-              size="lg"
-              flex={1}
-            >
-              重新开始
-            </Button>
-          </HStack>
-        </VStack>
-      </Box>
-    </VStack>
+        <Box>
+          <Heading as="h3" size="md" mb={2}>
+            AI 解答
+          </Heading>
+          <Text whiteSpace="pre-line">{answer}</Text>
+        </Box>
+
+        {advice && advice.length > 0 && (
+          <Box>
+            <Heading as="h3" size="md" mb={2}>
+              建议
+            </Heading>
+            <ul>
+              {advice.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </Box>
+        )}
+
+        <Button colorScheme="red" onClick={clearResult}>
+          重新算命
+        </Button>
+      </VStack>
+    </Box>
   );
-}; 
+};
