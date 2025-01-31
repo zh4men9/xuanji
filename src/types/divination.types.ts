@@ -1,8 +1,8 @@
 export interface IDivinationRequest {
   question: string;
-  birthDateTime?: string;
   name?: string;
   gender?: 'male' | 'female' | 'other';
+  birthDateTime?: string;
 }
 
 export interface IFortuneScores {
@@ -21,17 +21,27 @@ export interface IDivinationResponse {
   // timestamp: string;
 }
 
+export interface IUserInfo {
+  name: string;
+  gender?: 'male' | 'female' | 'other';
+  birthDateTime: string;
+}
+
+export interface IChatMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
 export interface IDivinationStore {
   isLoading: boolean;
   error: string | null;
   currentResponse: IDivinationResponse['answer'] | null;
   history: IChatMessage[];
+  userInfo: IUserInfo;
+  
+  setUserInfo: (info: Partial<IUserInfo>) => void;
   generateDivination: (request: IDivinationRequest) => Promise<void>;
   clearResult: () => void;
   clearHistory: () => void;
+  initializeUserInfo: () => void;
 }
-
-export interface IChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-} 

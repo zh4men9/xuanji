@@ -5,7 +5,7 @@ import { z } from 'zod'
 // 定义请求参数验证 schema
 const requestSchema = z.object({
   messages: z.array(z.object({
-    role: z.enum(['user', 'assistant']),
+    role: z.enum(['user', 'assistant', 'system']),
     content: z.string()
   })),
   model: z.string().optional().default('gpt-4-turbo-preview'),

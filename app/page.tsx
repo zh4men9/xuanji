@@ -20,21 +20,25 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="w-full max-w-4xl">
-          <ConversationHistory />
-
-          {!currentResponse ? <DivinationForm /> : <DivinationResult />}
-
-          {history.length > 0 && (
-            <div className="flex justify-between mt-4">
-              <button
-                onClick={clearHistory}
-                className="px-4 py-2 text-sm text-white/80 hover:text-white transition-colors"
-              >
-                清除对话历史
-              </button>
+        <div className="w-full max-w-4xl bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-xl">
+          <div className="flex flex-col space-y-6">
+            <ConversationHistory />
+            
+            <div className="sticky bottom-0 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-lg">
+              {!currentResponse ? <DivinationForm /> : <DivinationResult />}
+              
+              {history.length > 0 && (
+                <div className="flex justify-end mt-4">
+                  <button
+                    onClick={clearHistory}
+                    className="px-4 py-2 text-sm text-white/80 hover:text-white transition-colors"
+                  >
+                    清除对话历史
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

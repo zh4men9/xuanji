@@ -1,25 +1,38 @@
 import { create } from 'zustand';
-import type { IDivinationStore, IDivinationRequest, IChatMessage } from '@/types/divination.types';
+import type { IDivinationStore, IDivinationRequest, IChatMessage, IUserInfo } from '@/types/divination.types';
 
 export const useDivinationStore = create<IDivinationStore>((set, get) => ({
   isLoading: false,
   error: null,
-  currentResponse: null,
-  history: [],
+  history: [] as IChatMessage[],
+  userInfo: {
+    name: '',
+    gender: undefined,
+    birthDateTime: '',
+  } as IUserInfo,
+
+  setUserInfo: (info: Partial<IUserInfo>) => {
+    const newInfo = { ...get().userInfo, ...info };
+    set({ userInfo: newInfo });
+    localStorage.setItem('userInfo', JSON.stringify(newInfo));
+  },
 
   generateDivination: async (request: IDivinationRequest) => {
     try {
       set({ isLoading: true, error: null });
       
-      const userMessage: IChatMessage = { role: 'user', content: `
-              姓名：${request.name || '未提供'}
-              性别：${request.gender || '未提供'}
-              出生日期：${request.birthDateTime || '未提供'}
-              问题：${request.question}
-              
-              请扮演一位专业的算命大师，用markdown格式详细解答我的问题。` };
+      const userMessage: IChatMessage = {
+        role: 'user',
+        content: request.question,
+      };
 
-      set({ history: [...get().history, userMessage] });
+      const systemMessage: IChatMessage = {
+        role: 'system',
+        content: `你是一位专业的算命大师。用户信息：姓名：${request.name || '未提供'}，性别：${request.gender || '未提供'}，出生日期：${request.birthDateTime || '未提供'}。请用专业、详细的方式回答用户的问题，使用 markdown 格式。`,
+      };
+
+      const currentHistory = get().history;
+      set({ history: [...currentHistory, userMessage] });
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -27,31 +40,43 @@ export const useDivinationStore = create<IDivinationStore>((set, get) => ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          messages: [...get().history, userMessage]
-        })
+          messages: [systemMessage, ...currentHistory, userMessage],
+          temperature: 0.7,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('请求失败');
+        throw new Error(response.statusText || '请求失败');
       }
 
       const data = await response.json();
-      const aiMessage: IChatMessage = { role: 'assistant', content: data.answer };
+      const aiMessage: IChatMessage = {
+        role: 'assistant',
+        content: data.text || data.answer || '抱歉，我现在无法回答这个问题。',
+      };
 
       set({ history: [...get().history, aiMessage] });
-      set({ currentResponse: data.answer });
-    } catch (error: any) {
-      set({ error: error.message || '生成预测结果时出错' });
+    } catch (error) {
+      console.error('Divination Error:', error);
+      set({ error: error instanceof Error ? error.message : '生成预测结果时出错' });
     } finally {
       set({ isLoading: false });
     }
   },
 
-  clearResult: () => {
-    set({ currentResponse: null, error: null });
-  },
-
   clearHistory: () => {
     set({ history: [] });
+  },
+
+  initializeUserInfo: () => {
+    try {
+      const savedInfo = localStorage.getItem('userInfo');
+      if (savedInfo) {
+        const parsedInfo = JSON.parse(savedInfo) as IUserInfo;
+        set({ userInfo: parsedInfo });
+      }
+    } catch (error) {
+      console.error('Failed to load user info:', error);
+    }
   },
 }));

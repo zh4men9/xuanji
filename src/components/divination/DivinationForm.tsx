@@ -5,108 +5,49 @@ import { useDivinationStore } from '@/lib/divination';
 import type { IDivinationRequest } from '@/types/divination.types';
 
 export const DivinationForm = () => {
-  const { generateDivination, isLoading } = useDivinationStore();
-
-  const [formData, setFormData] = useState<IDivinationRequest>({
-    question: '',
-    birthDateTime: '',
-    name: '',
-    gender: undefined,
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const { generateDivination, isLoading, userInfo } = useDivinationStore();
+  const [question, setQuestion] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.question.trim()) {
+    if (!question.trim()) {
       alert('请输入您的问题');
       return;
     }
 
     try {
-      await generateDivination(formData);
+      await generateDivination({
+        question,
+        ...userInfo
+      });
+      setQuestion('');
     } catch (error) {
       alert(error instanceof Error ? error.message : '请稍后重试');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="card">
-      <div className="form-group">
-        <label htmlFor="question" className="form-label">
-          您的问题 <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="question"
-          name="question"
-          value={formData.question}
-          onChange={handleChange}
-          placeholder="请输入您想问的问题..."
-          className="form-textarea"
-          required
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="birthDateTime" className="form-label">
-          出生日期时间
-        </label>
-        <input
-          type="datetime-local"
-          id="birthDateTime"
-          name="birthDateTime"
-          value={formData.birthDateTime}
-          onChange={handleChange}
-          className="form-input"
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="name" className="form-label">
-          姓名
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="请输入您的姓名（选填）"
-          className="form-input"
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="gender" className="form-label">
-          性别
-        </label>
-        <select
-          id="gender"
-          name="gender"
-          value={formData.gender}
-          onChange={handleChange}
-          className="form-select"
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="flex items-end gap-4">
+        <div className="flex-1">
+          <textarea
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="请输入您想问的问题..."
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-sm rounded-lg border border-purple-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all resize-none"
+            rows={2}
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
-          <option value="">请选择性别（选填）</option>
-          <option value="male">男</option>
-          <option value="female">女</option>
-          <option value="other">其他</option>
-        </select>
+          {isLoading ? '思考中...' : '提问'}
+        </button>
       </div>
-
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="mt-6 w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isLoading ? '正在算命...' : '开始算命'}
-      </button>
     </form>
   );
 };
