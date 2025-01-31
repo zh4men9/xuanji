@@ -1,12 +1,13 @@
 'use client';
 
-import { Box, Container, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Heading, Text, VStack, HStack, Button } from '@chakra-ui/react';
 import { DivinationForm } from '@/components/divination/DivinationForm';
 import { DivinationResult } from '@/components/divination/DivinationResult';
+import { ConversationHistory } from '@/components/divination/ConversationHistory';
 import { useDivinationStore } from '@/lib/divination';
 
 export default function Home() {
-  const { currentResponse } = useDivinationStore();
+  const { currentResponse, clearHistory, history } = useDivinationStore();
 
   return (
     <Container maxW="container.xl" py={8}>
@@ -20,7 +21,17 @@ export default function Home() {
           </Text>
         </Box>
 
+        <ConversationHistory />
+
         {!currentResponse ? <DivinationForm /> : <DivinationResult />}
+
+        {history.length > 0 && (
+          <HStack justifyContent="space-between">
+            <Button colorScheme="gray" size="sm" onClick={clearHistory}>
+              清除对话历史
+            </Button>
+          </HStack>
+        )}
       </VStack>
     </Container>
   );

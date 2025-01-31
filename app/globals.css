@@ -3,20 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
+  --primary: #4A148C;
+  --primary-light: #7B1FA2;
+  --primary-dark: #311B92;
+  --accent: #FFD700;
+  --accent-light: #FFE57F;
+  --accent-dark: #FFC400;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply antialiased text-gray-900 bg-gray-50;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
-  min-height: 100vh;
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .btn-primary {
+    @apply bg-purple-900 text-white hover:bg-purple-800 
+           px-4 py-2 rounded-md font-medium 
+           transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-purple-900 border border-purple-900 
+           hover:bg-purple-50 px-4 py-2 rounded-md font-medium 
+           transition-colors duration-200;
+  }
+
+  .input-primary {
+    @apply block w-full rounded-md border-0 py-1.5 px-3
+           text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300
+           placeholder:text-gray-400 focus:ring-2 focus:ring-inset
+           focus:ring-purple-600 sm:text-sm sm:leading-6;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-sm p-6 
+           hover:shadow-md transition-shadow duration-200;
+  }
 }

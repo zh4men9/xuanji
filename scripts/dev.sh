@@ -1,5 +1,6 @@
 #!/bin/bash
 
+pnpm install 
 # 清理缓存
 echo "🧹 清理缓存..."
 rm -rf .next

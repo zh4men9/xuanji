@@ -1,41 +1,33 @@
 import { create } from 'zustand';
-import type { IDivinationStore, IDivinationRequest } from '@/types/divination.types';
+import type { IDivinationStore, IDivinationRequest, IChatMessage } from '@/types/divination.types';
 
-export const useDivinationStore = create<IDivinationStore>((set) => ({
+export const useDivinationStore = create<IDivinationStore>((set, get) => ({
   isLoading: false,
   error: null,
   currentResponse: null,
+  history: [],
 
   generateDivination: async (request: IDivinationRequest) => {
     try {
       set({ isLoading: true, error: null });
       
+      const userMessage: IChatMessage = { role: 'user', content: `
+              姓名：${request.name || '未提供'}
+              性别：${request.gender || '未提供'}
+              出生日期：${request.birthDateTime || '未提供'}
+              问题：${request.question}
+              
+              请扮演一位专业的算命大师，用markdown格式详细解答我的问题。` };
+
+      set({ history: [...get().history, userMessage] });
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          messages: [
-            {
-              role: 'user',
-              content: `请扮演一位专业的算命大师，为我解答以下问题。
-              姓名：${request.name || '未提供'}
-              性别：${request.gender || '未提供'}
-              出生日期：${request.birthDateTime || '未提供'}
-              问题：${request.question}
-              
-              请从以下几个方面进行分析：
-              1. 总体运势（0-100分）
-              2. 感情运势（0-100分）
-              3. 事业运势（0-100分）
-              4. 财运（0-100分）
-              5. 健康运势（0-100分）
-              
-              并给出具体建议。`
-            }
-          ],
-          temperature: 0.7
+          messages: [...get().history, userMessage]
         })
       });
 
@@ -44,7 +36,10 @@ export const useDivinationStore = create<IDivinationStore>((set) => ({
       }
 
       const data = await response.json();
-      set({ currentResponse: data });
+      const aiMessage: IChatMessage = { role: 'assistant', content: data.answer };
+
+      set({ history: [...get().history, aiMessage] });
+      set({ currentResponse: data.answer });
     } catch (error: any) {
       set({ error: error.message || '生成预测结果时出错' });
     } finally {
@@ -54,5 +49,9 @@ export const useDivinationStore = create<IDivinationStore>((set) => ({
 
   clearResult: () => {
     set({ currentResponse: null, error: null });
+  },
+
+  clearHistory: () => {
+    set({ history: [] });
   },
 }));
