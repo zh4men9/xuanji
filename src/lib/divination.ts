@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { IDivinationStore, IDivinationRequest, IChatMessage, IUserInfo } from '@/types/divination.types';
+import { saveChatHistory } from './chat';
 
 export const useDivinationStore = create<IDivinationStore>((set, get) => ({
   isLoading: false,
@@ -20,7 +21,7 @@ export const useDivinationStore = create<IDivinationStore>((set, get) => ({
   generateDivination: async (request: IDivinationRequest) => {
     try {
       set({ isLoading: true, error: null });
-      
+
       const userMessage: IChatMessage = {
         role: 'user',
         content: request.question,
@@ -54,6 +55,13 @@ export const useDivinationStore = create<IDivinationStore>((set, get) => ({
         role: 'assistant',
         content: data.text || data.answer || '抱歉，我现在无法回答这个问题。',
       };
+
+      // 保存聊天记录到数据库
+      await saveChatHistory(
+        request.name || 'anonymous',
+        request.question,
+        aiMessage.content
+      );
 
       set({ history: [...get().history, aiMessage] });
     } catch (error) {
