@@ -1,22 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  Textarea,
-  VStack,
-  useToast,
-} from '@chakra-ui/react';
 import { useDivinationStore } from '@/lib/divination';
 import type { IDivinationRequest } from '@/types/divination.types';
 
 export const DivinationForm = () => {
-  const toast = useToast();
   const { generateDivination, isLoading } = useDivinationStore();
 
   const [formData, setFormData] = useState<IDivinationRequest>({
@@ -37,86 +25,88 @@ export const DivinationForm = () => {
     e.preventDefault();
 
     if (!formData.question.trim()) {
-      toast({
-        title: '请输入您的问题',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
+      alert('请输入您的问题');
       return;
     }
 
     try {
       await generateDivination(formData);
     } catch (error) {
-      toast({
-        title: '算命失败',
-        description: error instanceof Error ? error.message : '请稍后重试',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+      alert(error instanceof Error ? error.message : '请稍后重试');
     }
   };
 
   return (
-    <Box as="form" onSubmit={handleSubmit} width="100%" maxW="600px" mx="auto">
-      <VStack spacing={6}>
-        <FormControl isRequired>
-          <FormLabel>您的问题</FormLabel>
-          <Textarea
-            name="question"
-            value={formData.question}
-            onChange={handleChange}
-            placeholder="请输入您想问的问题..."
-            minH="120px"
-          />
-        </FormControl>
+    <form onSubmit={handleSubmit} className="card">
+      <div className="form-group">
+        <label htmlFor="question" className="form-label">
+          您的问题 <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          id="question"
+          name="question"
+          value={formData.question}
+          onChange={handleChange}
+          placeholder="请输入您想问的问题..."
+          className="form-textarea"
+          required
+        />
+      </div>
 
-        <FormControl>
-          <FormLabel>出生日期时间</FormLabel>
-          <Input
-            name="birthDateTime"
-            type="datetime-local"
-            value={formData.birthDateTime}
-            onChange={handleChange}
-          />
-        </FormControl>
+      <div className="form-group">
+        <label htmlFor="birthDateTime" className="form-label">
+          出生日期时间
+        </label>
+        <input
+          type="datetime-local"
+          id="birthDateTime"
+          name="birthDateTime"
+          value={formData.birthDateTime}
+          onChange={handleChange}
+          className="form-input"
+        />
+      </div>
 
-        <FormControl>
-          <FormLabel>姓名</FormLabel>
-          <Input
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="请输入您的姓名（选填）"
-          />
-        </FormControl>
+      <div className="form-group">
+        <label htmlFor="name" className="form-label">
+          姓名
+        </label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="请输入您的姓名（选填）"
+          className="form-input"
+        />
+      </div>
 
-        <FormControl>
-          <FormLabel>性别</FormLabel>
-          <Select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            placeholder="请选择性别（选填）"
-          >
-            <option value="male">男</option>
-            <option value="female">女</option>
-            <option value="other">其他</option>
-          </Select>
-        </FormControl>
-
-        <Button
-          type="submit"
-          colorScheme="red"
-          size="lg"
-          width="100%"
-          isLoading={isLoading}
+      <div className="form-group">
+        <label htmlFor="gender" className="form-label">
+          性别
+        </label>
+        <select
+          id="gender"
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          className="form-select"
         >
-          开始算命
-        </Button>
-      </VStack>
-    </Box>
+          <option value="">请选择性别（选填）</option>
+          <option value="male">男</option>
+          <option value="female">女</option>
+          <option value="other">其他</option>
+        </select>
+      </div>
+
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="mt-6 w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isLoading ? '正在算命...' : '开始算命'}
+      </button>
+    </form>
   );
 };

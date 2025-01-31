@@ -1,6 +1,5 @@
 'use client';
 
-import { Box, Container, Heading, Text, VStack, HStack, Button } from '@chakra-ui/react';
 import { DivinationForm } from '@/components/divination/DivinationForm';
 import { DivinationResult } from '@/components/divination/DivinationResult';
 import { ConversationHistory } from '@/components/divination/ConversationHistory';
@@ -10,29 +9,34 @@ export default function Home() {
   const { currentResponse, clearHistory, history } = useDivinationStore();
 
   return (
-    <Container maxW="container.xl" py={8}>
-      <VStack spacing={8} align="stretch">
-        <Box textAlign="center">
-          <Heading as="h1" size="2xl" mb={4} color="red.600">
+    <div className="container mx-auto py-8 px-4">
+      <div className="flex flex-col items-center space-y-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
             玄机
-          </Heading>
-          <Text fontSize="xl" color="gray.600">
+          </h1>
+          <p className="text-xl text-white/90">
             AI 智能算命系统
-          </Text>
-        </Box>
+          </p>
+        </div>
 
-        <ConversationHistory />
+        <div className="w-full max-w-4xl">
+          <ConversationHistory />
 
-        {!currentResponse ? <DivinationForm /> : <DivinationResult />}
+          {!currentResponse ? <DivinationForm /> : <DivinationResult />}
 
-        {history.length > 0 && (
-          <HStack justifyContent="space-between">
-            <Button colorScheme="gray" size="sm" onClick={clearHistory}>
-              清除对话历史
-            </Button>
-          </HStack>
-        )}
-      </VStack>
-    </Container>
+          {history.length > 0 && (
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={clearHistory}
+                className="px-4 py-2 text-sm text-white/80 hover:text-white transition-colors"
+              >
+                清除对话历史
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,56 +1,52 @@
 'use client';
 
-import { Box, Text } from '@chakra-ui/react';
 import { useDivinationStore } from '@/lib/divination';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { cn } from '@/lib/utils';
 
 export const ConversationHistory = () => {
   const { history } = useDivinationStore();
 
   return (
-    <Box mt={4} p={4} borderWidth="1px" borderRadius="md" maxH="400px" overflowY="auto">
-      {history.map((message, index) => (
-        <Box key={index} my={2} alignSelf={message.role === 'user' ? 'flex-end' : 'flex-start'} >
-          <Text fontWeight="bold" color={message.role === 'user' ? 'blue.500' : 'green.500'}>
-            {message.role === 'user' ? '用户：' : 'AI：'}
-          </Text>
-          <Box
-            bg={message.role === 'user' ? 'blue.50' : 'green.50'}
-            p={2}
-            borderRadius="md"
-            maxWidth="80%"
-            ml={message.role === 'assistant' ? 2 : 0}
-            mr={message.role === 'user' ? 2 : 0}
-          >
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                code({node, inline, className, children, ...props}) {
-                  const match = /language-(\w+)/.exec(className || '')
-                  return !inline && match ? (
-                    <SyntaxHighlighter
-                      children={String(children).replace(/\n$/, '')}
-                      style={atomDark}
-                      language={match[1]}
-                      PreTag="div"
-                      {...props}
-                    />
-                  ) : (
-                    <code className={className} {...props}>
-                      {children}
-                    </code>
-                  )
-                }
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
-          </Box>
-        </Box>
-      ))}
-    </Box>
+    <div className="mt-4 p-4 border rounded-lg max-h-[400px] overflow-y-auto bg-white/80 backdrop-blur-sm shadow-lg">
+      {history
+        .filter((message) => message.role === 'user')
+        .map((message, index) => (
+          <div key={index} className="my-2 flex flex-col items-end">
+            <div className="font-semibold text-purple-600">
+              用户：
+            </div>
+            <div className="bg-purple-50 p-3 rounded-lg max-w-[80%] mr-2 shadow-sm">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  code({node, inline, className, children, ...props}) {
+                    const match = /language-(\w+)/.exec(className || '')
+                    return !inline && match ? (
+                      <SyntaxHighlighter
+                        children={String(children).replace(/\n$/, '')}
+                        style={atomDark}
+                        language={match[1]}
+                        PreTag="div"
+                        {...props}
+                      />
+                    ) : (
+                      <code className={cn('bg-purple-100 px-1 py-0.5 rounded text-sm', className)} {...props}>
+                        {children}
+                      </code>
+                    )
+                  }
+                }}
+                className="prose prose-purple max-w-none"
+              >
+                {message.content}
+              </ReactMarkdown>
+            </div>
+          </div>
+        ))}
+    </div>
   );
 };
