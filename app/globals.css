@@ -4,40 +4,32 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 262.1 83.3% 57.8%;
-    --radius: 0.75rem;
-    --background-start: #f0f2f5;
-    --background-end: #e2e8f0;
-    --gradient-1: #eef2ff;
-    --gradient-2: #e0e7ff;
-    --gradient-3: #dbeafe;
-    --primary-hover: #0077ed;
-    --secondary: #86868b;
-    --text: #000000;
-    --text-secondary: #424245;
-    --shadow: rgba(0, 0, 0, 0.08);
-    --card-bg: rgba(255, 255, 255, 0.65);
-    --nav-bg: rgba(255, 255, 255, 0.75);
-    --card-shadow: 0 4px 24px var(--shadow);
-    --card-highlight: rgba(255, 255, 255, 0.85);
+    /* 深色背景配色方案 */
+    --background-deep: #000000;
+    --background-light: #1a1a1a;
+    --gradient-accent-1: #2f3a6d;
+    --gradient-accent-2: #1f2937;
+    --gradient-accent-3: #312e81;
+    
+    /* 卡片和导航栏背景 */
+    --card-bg: rgba(255, 255, 255, 0.08);
+    --nav-bg: rgba(0, 0, 0, 0.7);
+    --card-highlight: rgba(255, 255, 255, 0.12);
+    
+    /* 主色调 */
+    --primary: #0a84ff;
+    --primary-hover: #0071e3;
+    --secondary: #6b7280;
+    
+    /* 文字颜色 */
+    --text: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.5);
+    
+    /* 边框和阴影 */
+    --border: rgba(255, 255, 255, 0.1);
+    --shadow: rgba(0, 0, 0, 0.3);
+    --glow: rgba(10, 132, 255, 0.3);
   }
 
   * {
@@ -45,13 +37,15 @@
   }
 
   body {
-    @apply bg-gradient-to-r from-purple-500 to-indigo-500 text-foreground antialiased min-h-screen;
     background: 
-      linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 50%, var(--gradient-3) 100%),
-      linear-gradient(180deg, var(--background-start) 0%, var(--background-end) 100%);
-    background-blend-mode: soft-light;
+      radial-gradient(circle at top left, var(--gradient-accent-1), transparent 50%),
+      radial-gradient(circle at top right, var(--gradient-accent-2), transparent 50%),
+      radial-gradient(circle at bottom left, var(--gradient-accent-3), transparent 50%),
+      linear-gradient(to bottom, var(--background-deep), var(--background-light));
+    background-attachment: fixed;
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    min-height: 100vh;
   }
 }
 
@@ -87,24 +81,15 @@
     @apply block text-sm font-medium text-gray-700;
   }
 
-  .form-input {
-    @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm 
-           ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium 
-           placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
-           focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  .form-input, .form-textarea, .form-select {
+    @apply bg-opacity-10 backdrop-blur-lg border-opacity-20 text-white;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--border);
   }
 
-  .form-textarea {
-    @apply w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm 
-           ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none 
-           focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
-           disabled:cursor-not-allowed disabled:opacity-50;
-  }
-
-  .form-select {
-    @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm 
-           ring-offset-background focus-visible:outline-none focus-visible:ring-2 
-           focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    @apply ring-primary border-primary;
+    background-color: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -114,17 +99,17 @@
     var(--card-highlight),
     var(--card-bg)
   );
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  box-shadow: var(--card-shadow);
+  border-radius: 24px;
+  box-shadow: 0 4px 24px var(--shadow);
 }
 
 .nav-glass {
   background: var(--nav-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid var(--border);
   box-shadow: 0 1px 12px var(--shadow);
 }
@@ -136,12 +121,12 @@
   border-radius: 980px;
   font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3);
+  box-shadow: 0 0 20px var(--glow);
 }
 
 .apple-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.4);
+  box-shadow: 0 0 30px var(--glow);
 }
 
 .apple-card {
@@ -158,7 +143,10 @@
   font-weight: 600;
   letter-spacing: -0.003em;
   color: var(--text);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, #ffffff, #e0e0e0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .section-subtitle {
@@ -166,7 +154,6 @@
   font-weight: 400;
   color: var(--text-secondary);
   letter-spacing: -0.022em;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.03);
 }
 
 /* 滚动条美化 */
@@ -176,14 +163,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--secondary);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.3);
 }
