@@ -21,7 +21,7 @@ export function Navigation() {
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2">
               <img
-                src="/logo.svg"
+                src="/logo.png"
                 alt="玄机"
                 className="h-8 w-8"
                 width={32}

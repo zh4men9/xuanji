@@ -13,7 +13,8 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Avatar
+  Avatar,
+  Image
 } from '@chakra-ui/react';
 import { HamburgerIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
 
@@ -41,9 +42,13 @@ export const Header = ({ onMobileMenuOpen }: { onMobileMenuOpen: () => void }) =
             aria-label="open menu"
             icon={<HamburgerIcon />}
           />
-          <Text fontSize="2xl" fontWeight="bold" color="red.500">
-            玄机
-          </Text>
+          <Image 
+            src="/logo.png" 
+            alt="玄机AI算命系统"
+            width={120}
+            height={40}
+            className="h-10 w-auto"
+          />
         </HStack>
 
         {/* Right Section */}
