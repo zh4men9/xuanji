@@ -18,21 +18,23 @@ export const DivinationResult = () => {
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
-            code({node, inline, className, children, ...props}) {
-              const match = /language-(\w+)/.exec(className || '')
-              return !inline && match ? (
+            code({node, className, children, ...props}) {
+              const match = /language-(\w+)/.exec(className || '');
+              const isCodeBlock = !!match;
+              
+              return isCodeBlock ? (
                 <SyntaxHighlighter
-                  children={String(children).replace(/\n$/, '')}
-                  style={atomDark}
                   language={match[1]}
+                  style={atomDark}
                   PreTag="div"
-                  {...props}
-                />
+                >
+                  {String(children)}
+                </SyntaxHighlighter>
               ) : (
                 <code className={cn('bg-purple-100 px-1 py-0.5 rounded text-sm', className)} {...props}>
                   {children}
                 </code>
-              )
+              );
             }
           }}
         >

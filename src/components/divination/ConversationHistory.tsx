@@ -37,12 +37,16 @@ export const ConversationHistory = () => {
                   const match = /language-(\w+)/.exec(className || '')
                   return match ? (
                     <SyntaxHighlighter
-                      children={String(children).replace(/\n$/, '')}
-                      style={atomDark as any}
                       language={match[1] as any}
-                      PreTag={'div'}
-                      {...props}
-                    />
+                      style={atomDark}
+                      PreTag="div"
+                      className={cn(
+                        "prose max-w-none",
+                        message.role === 'user' ? 'prose-purple' : 'prose-blue'
+                      )}
+                    >
+                      {String(children).replace(/\n$/, '')}
+                    </SyntaxHighlighter>
                   ) : (
                     <code className={cn('bg-purple-100 px-1 py-0.5 rounded text-sm', className)} {...props}>
                       {children}
@@ -50,10 +54,6 @@ export const ConversationHistory = () => {
                   )
                 }
               }}
-              className={cn(
-                "prose max-w-none",
-                message.role === 'user' ? 'prose-purple' : 'prose-blue'
-              )}
             >
               {message.content}
             </ReactMarkdown>
