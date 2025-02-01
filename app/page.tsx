@@ -3,10 +3,11 @@
 import { DivinationForm } from '@/components/divination/DivinationForm';
 import { DivinationResult } from '@/components/divination/DivinationResult';
 import { ConversationHistory } from '@/components/divination/ConversationHistory';
+import { ModelSelector } from '@/components/ModelSelector';
 import { useDivinationStore } from '@/lib/divination';
 
 export default function Home() {
-  const { currentResponse, clearHistory, history } = useDivinationStore();
+  const { currentResponse, clearHistory, history, selectedModel, setSelectedModel } = useDivinationStore();
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -23,6 +24,10 @@ export default function Home() {
         <div className="w-full max-w-4xl bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-xl">
           <div className="flex flex-col space-y-6">
             <ConversationHistory />
+            <ModelSelector
+              value={selectedModel}
+              onChange={setSelectedModel}
+            />
             
             <div className="sticky bottom-0 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-lg">
               {!currentResponse ? <DivinationForm /> : <DivinationResult />}

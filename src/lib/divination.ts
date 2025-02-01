@@ -37,6 +37,7 @@ export const useDivinationStore = create<IDivinationStore>((set, get) => ({
     gender: undefined,
     birthDateTime: '',
   } as IUserInfo,
+  selectedModel: 'gemini-1.5-pro-latest',
 
   clearResult: () => set({ currentResponse: null }),
 
@@ -45,6 +46,8 @@ export const useDivinationStore = create<IDivinationStore>((set, get) => ({
     set({ userInfo: newInfo });
     localStorage.setItem('userInfo', JSON.stringify(newInfo));
   },
+
+  setSelectedModel: (model: string) => set({ selectedModel: model }),
 
   generateDivination: async (request: IDivinationRequest) => {
     try {
