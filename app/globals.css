@@ -4,32 +4,33 @@
 
 @layer base {
   :root {
-    /* 深色背景配色方案 */
-    --background-deep: #000000;
-    --background-light: #1a1a1a;
-    --gradient-accent-1: #2f3a6d;
-    --gradient-accent-2: #1f2937;
-    --gradient-accent-3: #312e81;
+    /* 优雅的浅蓝色背景方案 */
+    --background-start: #e8f0fe;  /* 最浅的蓝色 */
+    --background-end: #c2d7f8;    /* 稍深的蓝色 */
+    --accent-1: #a7c5f2;         /* 装饰蓝 */
+    --accent-2: #8ab4f8;         /* 点缀蓝 */
+    --accent-3: #4285f4;         /* 强调蓝 */
     
-    /* 卡片和导航栏背景 */
-    --card-bg: rgba(255, 255, 255, 0.08);
-    --nav-bg: rgba(0, 0, 0, 0.7);
-    --card-highlight: rgba(255, 255, 255, 0.12);
+    /* 卡片和导航栏 */
+    --card-bg: rgba(206, 225, 247, 0.7);     /* 半透明浅蓝背景 */
+    --nav-bg: rgba(232, 240, 254, 0.85);     /* 导航栏背景 */
+    --card-highlight: rgba(232, 240, 254, 0.8); /* 卡片高光 */
     
     /* 主色调 */
-    --primary: #0a84ff;
-    --primary-hover: #0071e3;
-    --secondary: #6b7280;
+    --primary: #1a73e8;          /* 主按钮蓝 */
+    --primary-hover: #1557b0;    /* 悬浮状态 */
+    --secondary: #5f6368;        /* 次要文字 */
     
     /* 文字颜色 */
-    --text: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --text-muted: rgba(255, 255, 255, 0.5);
+    --text: #202124;             /* 主文字色 */
+    --text-secondary: #5f6368;   /* 次要文字 */
+    --text-muted: #80868b;       /* 淡化文字 */
+    --text-on-primary: #ffffff;  /* 按钮文字 */
     
-    /* 边框和阴影 */
-    --border: rgba(255, 255, 255, 0.1);
-    --shadow: rgba(0, 0, 0, 0.3);
-    --glow: rgba(10, 132, 255, 0.3);
+    /* 特殊效果 */
+    --border: rgba(0, 0, 0, 0.08);
+    --shadow: rgba(60, 64, 67, 0.15);
+    --glow: rgba(26, 115, 232, 0.25);
   }
 
   * {
@@ -38,39 +39,40 @@
 
   body {
     background: 
-      radial-gradient(circle at top left, var(--gradient-accent-1), transparent 50%),
-      radial-gradient(circle at top right, var(--gradient-accent-2), transparent 50%),
-      radial-gradient(circle at bottom left, var(--gradient-accent-3), transparent 50%),
-      linear-gradient(to bottom, var(--background-deep), var(--background-light));
+      radial-gradient(circle at 0% 0%, var(--accent-1), transparent 50%),
+      radial-gradient(circle at 100% 0%, var(--accent-2), transparent 50%),
+      radial-gradient(circle at 50% 100%, var(--accent-3), transparent 50%),
+      linear-gradient(135deg, var(--background-start), var(--background-end));
     background-attachment: fixed;
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
     min-height: 100vh;
+    letter-spacing: -0.022em;
   }
 }
 
 @layer components {
   .btn-primary {
     @apply bg-purple-900 text-white hover:bg-purple-800 
-           px-4 py-2 rounded-md font-medium 
+           px-4 py-2 rounded-xl font-medium 
            transition-colors duration-200;
   }
 
   .btn-secondary {
     @apply bg-white text-purple-900 border border-purple-900 
-           hover:bg-purple-50 px-4 py-2 rounded-md font-medium 
+           hover:bg-purple-50 px-4 py-2 rounded-xl font-medium 
            transition-colors duration-200;
   }
 
   .input-primary {
-    @apply block w-full rounded-md border-0 py-1.5 px-3
+    @apply block w-full rounded-xl border-0 py-1.5 px-3
            text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300
            placeholder:text-gray-400 focus:ring-2 focus:ring-inset
            focus:ring-purple-600 sm:text-sm sm:leading-6;
   }
 
   .card {
-    @apply bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 space-y-6;
+    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 space-y-6;
   }
 
   .form-group {
@@ -78,18 +80,20 @@
   }
 
   .form-label {
-    @apply block text-sm font-medium text-gray-700;
+    @apply block text-sm font-medium;
+    color: var(--text);
   }
 
   .form-input, .form-textarea, .form-select {
-    @apply bg-opacity-10 backdrop-blur-lg border-opacity-20 text-white;
-    background-color: rgba(255, 255, 255, 0.05);
+    @apply backdrop-blur-lg rounded-xl;
+    background-color: rgba(255, 255, 255, 0.9);
     border-color: var(--border);
+    color: var(--text);
   }
 
   .form-input:focus, .form-textarea:focus, .form-select:focus {
     @apply ring-primary border-primary;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.95);
   }
 }
 
@@ -99,34 +103,41 @@
     var(--card-highlight),
     var(--card-bg)
   );
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
   border-radius: 24px;
-  box-shadow: 0 4px 24px var(--shadow);
+  box-shadow: 
+    0 4px 12px var(--shadow),
+    0 0 1px var(--border);
 }
 
 .nav-glass {
   background: var(--nav-bg);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 12px var(--shadow);
+  box-shadow: 0 1px 8px var(--shadow);
 }
 
 .apple-button {
-  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-hover) 100%);
-  color: white;
+  background: var(--primary);
+  color: var(--text-on-primary);
   padding: 12px 24px;
   border-radius: 980px;
   font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 20px var(--glow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 6px var(--glow),
+    0 0 0 1px var(--border);
 }
 
 .apple-button:hover {
+  background: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 0 30px var(--glow);
+  box-shadow: 
+    0 4px 12px var(--glow),
+    0 0 0 1px var(--border);
 }
 
 .apple-card {
@@ -139,21 +150,19 @@
 }
 
 .section-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 600;
   letter-spacing: -0.003em;
   color: var(--text);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(180deg, #ffffff, #e0e0e0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  line-height: 1.2;
 }
 
 .section-subtitle {
   font-size: 17px;
   font-weight: 400;
   color: var(--text-secondary);
-  letter-spacing: -0.022em;
+  line-height: 1.5;
 }
 
 /* 滚动条美化 */
@@ -163,14 +172,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--background-start);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--accent-2);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--accent-3);
 }
