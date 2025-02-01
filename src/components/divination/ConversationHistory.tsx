@@ -33,14 +33,14 @@ export const ConversationHistory = () => {
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                code({node, inline, className, children, ...props}) {
+                code({node, className, children, ...props}) {
                   const match = /language-(\w+)/.exec(className || '')
-                  return !inline && match ? (
+                  return match ? (
                     <SyntaxHighlighter
                       children={String(children).replace(/\n$/, '')}
-                      style={atomDark}
-                      language={match[1]}
-                      PreTag="div"
+                      style={atomDark as any}
+                      language={match[1] as any}
+                      PreTag={'div'}
                       {...props}
                     />
                   ) : (

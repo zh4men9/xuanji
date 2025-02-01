@@ -33,6 +33,8 @@ export interface IChatMessage {
 }
 
 export interface IDivinationStore {
+  setSelectedModel: any;
+  selectedModel: any;
   isLoading: boolean;
   error: string | null;
   currentResponse: IDivinationResponse['answer'] | null;

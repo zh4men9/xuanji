@@ -5,9 +5,20 @@ import { DivinationResult } from '@/components/divination/DivinationResult';
 import { ConversationHistory } from '@/components/divination/ConversationHistory';
 import { ModelSelector } from '@/components/ModelSelector';
 import { useDivinationStore } from '@/lib/divination';
-
 export default function Home() {
-  const { currentResponse, clearHistory, history, selectedModel, setSelectedModel } = useDivinationStore();
+  const { 
+    currentResponse, 
+    clearHistory, 
+    history, 
+    selectedModel, 
+    setSelectedModel 
+  } = useDivinationStore((state) => ({
+    currentResponse: state.currentResponse,
+    clearHistory: state.clearHistory,
+    history: state.history,
+    selectedModel: state.selectedModel!,
+    setSelectedModel: state.setSelectedModel!
+  }));
 
   return (
     <div className="container mx-auto py-8 px-4">
