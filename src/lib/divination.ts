@@ -2,15 +2,43 @@ import { create } from 'zustand';
 import type { IDivinationStore, IDivinationRequest, IChatMessage, IUserInfo } from '@/types/divination.types';
 import { saveChatHistory } from './chat';
 
+/**
+ * Gemini API 响应格式示例:
+ * {
+ *   "id": "chatcmpl-abc123",
+ *   "object": "chat.completion",
+ *   "created": 1738386140,
+ *   "model": "gemini-2.0-flash-exp",
+ *   "choices": [
+ *     {
+ *       "message": {
+ *         "role": "assistant",
+ *         "content": "AI的回答内容",
+ *         "refusal": null
+ *       },
+ *       "finish_reason": "stop",
+ *       "index": 0,
+ *       "logprobs": null
+ *     }
+ *   ],
+ *   "_geminiModel": "gemini-2.0-flash-exp"
+ * }
+ * 
+ * 注意: 获取 AI 回答内容需要使用 data.choices[0].message.content
+ */
+
 export const useDivinationStore = create<IDivinationStore>((set, get) => ({
   isLoading: false,
   error: null,
   history: [] as IChatMessage[],
+  currentResponse: null,
   userInfo: {
     name: '',
     gender: undefined,
     birthDateTime: '',
   } as IUserInfo,
+
+  clearResult: () => set({ currentResponse: null }),
 
   setUserInfo: (info: Partial<IUserInfo>) => {
     const newInfo = { ...get().userInfo, ...info };
@@ -53,7 +81,7 @@ export const useDivinationStore = create<IDivinationStore>((set, get) => ({
       const data = await response.json();
       const aiMessage: IChatMessage = {
         role: 'assistant',
-        content: data.text || data.answer || '抱歉，我现在无法回答这个问题。',
+        content: data.choices?.[0]?.message?.content || '抱歉，我现在无法回答这个问题。',
       };
 
       // 保存聊天记录到数据库

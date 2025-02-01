@@ -1,61 +1,61 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import {
-  Home,
-  User,
-  Clock,
-  Settings
-} from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const navigation = [
-  { name: '算命大厅', href: '/', icon: Home },
-  { name: '个人中心', href: '/profile', icon: User },
-  { name: '历史记录', href: '/history', icon: Clock },
-  { name: '设置', href: '/settings', icon: Settings },
+  { name: '首页', href: '/' },
+  { name: '算命', href: '/divination' },
+  { name: '历史记录', href: '/history' },
+  { name: '关于', href: '/about' },
 ];
 
 export function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-1 flex-col">
-      <ul role="list" className="flex flex-1 flex-col gap-y-7">
-        <li>
-          <ul role="list" className="-mx-2 space-y-1">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      isActive
-                        ? 'bg-purple-800 text-white'
-                        : 'text-purple-200 hover:text-white hover:bg-purple-800',
-                      'group flex items-center gap-x-2 rounded-md p-2 text-sm leading-6 font-semibold'
-                    )}
-                  >
-                    <item.icon
-                      className={cn(
-                        isActive
-                          ? 'text-white'
-                          : 'text-purple-200 group-hover:text-white',
-                        'w-3.5 h-3.5 shrink-0'
-                      )}
-                      strokeWidth={1.5}
-                      size={14}
-                    />
-                    {item.name}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </li>
-      </ul>
+    <nav className="fixed top-0 left-0 right-0 z-50 nav-glass">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center gap-8">
+            <Link href="/" className="flex items-center gap-2">
+              <img
+                src="/logo.svg"
+                alt="玄机"
+                className="h-8 w-8"
+                width={32}
+                height={32}
+              />
+              <span className="text-lg font-semibold">玄机</span>
+            </Link>
+            <div className="hidden md:flex md:gap-6">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    'px-3 py-2 text-sm font-medium transition-colors',
+                    pathname === item.href
+                      ? 'text-primary'
+                      : 'text-text-secondary hover:text-text'
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <a
+              href="mailto:zh4men9@163.com"
+              className="text-sm text-text-secondary hover:text-text transition-colors"
+            >
+              联系我们
+            </a>
+          </div>
+        </div>
+      </div>
     </nav>
   );
 } 
